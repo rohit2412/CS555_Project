@@ -1,6 +1,10 @@
 #!/usr/bin/python
 import sys
+import commit
+from  commit import Commit
 import whrandom as rand
+from uuid import uuid4
+
 
 def readGraph(cur, text):
     n = int(text[cur].strip())
@@ -107,23 +111,41 @@ def main():
 
     inputFile = sys.argv[1]
     g1, g2, subgraphInducer, pi_original = parse_input_file(inputFile) 
+    iteration = 0
+
+    uid = uuid4().hex
 
     while True:
+        fname = "transcript_iter_%d_%s.txt"%(iteration,uid)
+        fp = open(fname, 'w')
+        print "Transcript is being written to file %s"%(fname)
         alpha = get_random_isomorphism(len(g2))
     
         q = get_isomorphic_graph(g2, alpha)
         # @rbhatia COMMIT TO 'q' and print commitment
-
+        print "Committed to graph Q"
+        commitQ = Commit(q)
+        (commitmentQ, randomAQ) = commitQ.getCommitment()
+        fp.write("Commitment of graph Q:\n")
+        fp.write(commit.prettyPrintMatrix(commitmentQ))
+        fp.write("Random matrix for commitment of Q:\n")
+        fp.write(commit.prettyPrintMatrix(randomAQ))
+        fp.write("\n\n")
+ 
         coin_toss = raw_input("Say H(ead)/T(tail)/Q(uit): ").strip()[0].lower()
         if coin_toss == 'q':
             break
         elif coin_toss == 'h':
             pass
             # @rbhatia (1) print alpha (2) Open the commitment to 'q' (3) Print "passed" iff get_isomorphic_graph(g2, alpha) == q
+            get_isomorphic_graph(g2, alpha)
+            print ""
+
         else:
             pi, qP = get_iso_and_iso_subgraph(g1, g2, subgraphInducer, pi_original, alpha, q)
             subgraph_bool_matrix = get_boolean_matrix(g2, subgraphInducer)
             # @rbhatia (1) reveal only part of subgraph_bool_matrix part of Q and reveal pi (2) print "passed" iff get_isomorphic_graph(g1, pi) == qP
+
     return 0
 if __name__ == "__main__":
     sys.exit(main())
