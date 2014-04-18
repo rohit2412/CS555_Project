@@ -1,3 +1,4 @@
+#!/usr/bin/python
 import sys
 import whrandom as rand
 
@@ -96,8 +97,16 @@ def get_boolean_matrix(g, si):
            bool_matrix[vertex][i] = False
            bool_matrix[i][vertex] = False
 
+def printUsage():
+  print "Usgae: %s <input file>"%sys.argv[0]
+
 def main():
-    g1, g2, subgraphInducer, pi_original = parse_input_file("input1.txt") # change to sys.argv[1]
+    if len(sys.argv) != 2:
+      printUsage()
+      return 1
+
+    inputFile = sys.argv[1]
+    g1, g2, subgraphInducer, pi_original = parse_input_file(inputFile) 
 
     while True:
         alpha = get_random_isomorphism(len(g2))
@@ -115,6 +124,6 @@ def main():
             pi, qP = get_iso_and_iso_subgraph(g1, g2, subgraphInducer, pi_original, alpha, q)
             subgraph_bool_matrix = get_boolean_matrix(g2, subgraphInducer)
             # @rbhatia (1) reveal only part of subgraph_bool_matrix part of Q and reveal pi (2) print "passed" iff get_isomorphic_graph(g1, pi) == qP
-    
+    return 0
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
